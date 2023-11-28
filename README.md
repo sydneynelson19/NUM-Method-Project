@@ -1,17 +1,7 @@
 # NUM-Method-Project
 clear, clc, close all
 %%%%%%%%%% Driver Script
-% Time span
-tspan = linspace(0, 10, 1000);
-[t, y] = rk4(@odefun, tspan, y0);
-
-
-
-
-%%%%%%%%%% Functions
-
-% ODEFUN function
-function dydt = odefun(t, y)
+% Initial Parameters
 beta = 1;
 mu_L_inv = 6; 
 mu_I_inv = 10; 
@@ -23,6 +13,18 @@ L_i = 0.01*S_i;
 I_i = 0;
 R_i = mu_I_inv*I_i;
 B_i = 1;
+
+% Time span
+tspan = linspace(0, 10, 1000);
+[t, y] = rk4(@odefun, tspan, y0);
+
+
+
+
+%%%%%%%%%% Functions
+
+% ODEFUN function
+function dydt = odefun(t, y)
 
 S = y(1);
 I = y(2);
