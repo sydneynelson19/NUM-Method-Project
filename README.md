@@ -2,22 +2,24 @@
 clear, clc, close all
 %%%%%%%%%% Driver Script
 % Initial Parameters
+load EnvironmentalForcing.mat
+h = 0.01;
 beta = 1;
-mu_L_inv = 6; 
-mu_I_inv = 10; 
+mu_L = 6; 
+mu_I = 10; 
 e = 0.001;
 A_p = 5000;
 P_i = 930.27249;
 S_i = P_i/A_p;
 L_i = 0.01*S_i;
 I_i = 0;
-R_i = mu_I_inv*I_i;
+R_i = mu_I*I_i;
 B_i = 1;
-
+y0 = [S_i,L_i,I_i,R_i,B_i,0];
+T_E = -0.35968 + 0.10789*T - 0.00214*(T.^2);
 % Time span
-tspan = linspace(0, 10, 1000);
+tspan = 0:60;
 [t, y] = rk4(@odefun, tspan, y0);
-
 
 
 
@@ -25,7 +27,6 @@ tspan = linspace(0, 10, 1000);
 
 % ODEFUN function
 function dydt = odefun(t, y)
-
 S = y(1);
 I = y(2);
 L = y(3);
@@ -34,15 +35,15 @@ P = y(5);
 P_b = y(6);
 
 % System of ODEs
-dSdt = -beta*S*I + (1/A_p)*(1/mu_L_inv)*P;
-dLdt = beta*S*I-(1/mu_L_inv)*L + e;
-dIdt = (1/mu_L_inv) - (1/mu_I_inv)*I;
-dRdt = (1/mu_I_inv)*I;
-dPdt = (1/mu_L_inv)*P_b + (1/mu_L_inv)*P;
-dP_bdt = (0.1724*P_b - 0.0000212*(P_b^2))*T_E*A_p;
-
+dSdt = -beta*S*I + dPdt*(1/A_p);
+dLdt = beta*S*I-(1/mu_L)*L + e;
+dIdt = (1/mu_L) - (1/mu_I)*I;
+dRdt = (1/mu_I)*I;
+dP_bdt = (0.1724*P_b - 0.0000212*(P_b^2))*T_E;
+dPdt = dP_bdt + (1.33*t_d)*T_E;
 dydt = [dSdt; dIdt; dLdt; dRdt; dPdt; dP_bdt];
-    end
+end
+
 % SLIRP FUNCTION
 function slopes = SLIRP
 
